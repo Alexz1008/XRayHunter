@@ -11,24 +11,20 @@ import org.bukkit.Material;
 /**
  * Comparator the maps of block-counts for two users
  */
-public class PlayerStatsComparator implements Comparator<PlayerStats> {
+public class PlayerStatsComparatorNether implements Comparator<PlayerStats> {
 	public static final List<Material> MATS = Arrays.asList(
-			Material.DIAMOND_ORE,
-			Material.SPAWNER,
-			Material.EMERALD_ORE,
-			Material.GOLD_ORE,
-			Material.IRON_ORE,
-			Material.STONE
+			Material.ANCIENT_DEBRIS,
+			Material.NETHER_QUARTZ_ORE,
+			Material.NETHER_GOLD_ORE,
+			Material.NETHERRACK
 			);
 
 	public static final Map<Material, String> MAT_COLORS = new HashMap<>();
 	static {
-		MAT_COLORS.put(Material.DIAMOND_ORE, "§b");
-		MAT_COLORS.put(Material.SPAWNER, "§8");
-		MAT_COLORS.put(Material.EMERALD_ORE, "§a");
-		MAT_COLORS.put(Material.GOLD_ORE, "§e");
-		MAT_COLORS.put(Material.IRON_ORE, "§f");
-		MAT_COLORS.put(Material.STONE, "§7");
+		MAT_COLORS.put(Material.NETHER_GOLD_ORE, "§e");
+		MAT_COLORS.put(Material.NETHER_QUARTZ_ORE, "§f");
+		MAT_COLORS.put(Material.ANCIENT_DEBRIS, "§c");
+		MAT_COLORS.put(Material.NETHERRACK, "§7");
 	}
 
 	public static String getColor(Material mat) {
