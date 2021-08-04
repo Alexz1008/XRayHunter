@@ -25,7 +25,7 @@ public class CoreProtectHandler {
 	public static final int ACTION_PLACE = 1;
 	private static final Logger log = Logger.getLogger(CoreProtectHandler.class.getName());
 	private static final List<CoreProtectAdaptor> adaptors = Arrays.<CoreProtectAdaptor>asList(
-			new CoreProtectAdaptor_19_1()
+			new CoreProtectAdaptor_20_1()
 			);
 
 	public static void performLookup(final Plugin plugin, final CommandSender sender, final int stime, final List<Material> restrictBlocks, final List<Integer> excludeBlocks, final Callback callback) {
@@ -34,7 +34,7 @@ public class CoreProtectHandler {
 				final List<Integer> action_list = new ArrayList<>();
 				action_list.add(0); // ActionId = 0 - Break
 				action_list.add(1); // ActionId = 1 - Place
-				final Location location = (sender instanceof Player) ? ((Player) sender).getLocation() : null;
+				final Location location = sender instanceof Player ? ((Player) sender).getLocation() : null;
 				final int now = (int) (System.currentTimeMillis() / 1000L);
 				final CoreProtectAdaptor adaptor = getAdaptor();
 				if (adaptor != null) {

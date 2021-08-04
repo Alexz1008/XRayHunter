@@ -59,7 +59,7 @@ public class AbstractCoreProtectAdaptor {
 			final int major2 = Integer.parseInt(m2.group("major"), 10);
 			final int minor1 = Integer.parseInt(m1.group("minor"), 10);
 			final int minor2 = Integer.parseInt(m1.group("minor"), 10);
-			return major1 >= major2 || (major1 == major2 && minor1 >= minor2);
+			return major1 >= major2 || major1 == major2 && minor1 >= minor2;
 		}
 		return false;
 	}

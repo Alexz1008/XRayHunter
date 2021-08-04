@@ -43,7 +43,7 @@ public class XRayHunter extends JavaPlugin {
 		if (plugin instanceof CoreProtect && plugin.isEnabled()) {
 			final CoreProtect coreProtect = (CoreProtect) plugin;
 			final CoreProtectAPI api = coreProtect.getAPI();
-			if (api != null && api.APIVersion() >= 6 && CoreProtectHandler.getAdaptor() != null) {
+			if (api != null && api.APIVersion() >= 7 && CoreProtectHandler.getAdaptor() != null) {
 				return api;
 			}
 		}

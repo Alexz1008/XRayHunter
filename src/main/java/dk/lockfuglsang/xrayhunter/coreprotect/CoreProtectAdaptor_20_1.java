@@ -12,13 +12,13 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
-public class CoreProtectAdaptor_19_1 extends AbstractCoreProtectAdaptor implements CoreProtectAdaptor {
+public class CoreProtectAdaptor_20_1 extends AbstractCoreProtectAdaptor implements CoreProtectAdaptor {
 	@Override
 	public boolean isAvailable() {
 		final Plugin plugin = Bukkit.getPluginManager().getPlugin("CoreProtect");
 		return plugin != null && plugin.getDescription() != null &&
-				isVersionLaterThan(plugin.getDescription().getVersion(), "19.1") &&
-				getLookupClass() != null && getLookupMethod(getLookupClass()) != null;
+				isVersionLaterThan(plugin.getDescription().getVersion(), "20.1") &&
+				getLookupClass() != null;
 	}
 
 	@SuppressWarnings("unchecked")
