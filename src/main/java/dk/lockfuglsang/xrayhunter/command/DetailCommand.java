@@ -75,7 +75,7 @@ public class DetailCommand extends AbstractCommand {
 		// TODO: 19/04/2015 - R4zorax: Pagination
 		final Player player = (Player) sender;
 		final StringBuilder sb = new StringBuilder();
-		final int maxPage = ((veins.size() - 1) / 10) + 1;
+		final int maxPage = (veins.size() - 1) / 10 + 1;
 		final int p = page < 1 ? 1 : page > maxPage ? maxPage : page;
 		sb.append(tr("Showing what {0} has found §9({1}/{2})", playerStats.getPlayer(), p, maxPage) + "\n");
 		long tlast = System.currentTimeMillis();

@@ -13,12 +13,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 public class CoreProtectAdaptor_20_1 extends AbstractCoreProtectAdaptor implements CoreProtectAdaptor {
+
 	@Override
 	public boolean isAvailable() {
 		final Plugin plugin = Bukkit.getPluginManager().getPlugin("CoreProtect");
 		return plugin != null && plugin.getDescription() != null &&
 				isVersionLaterThan(plugin.getDescription().getVersion(), "20.1") &&
-				getLookupClass() != null;
+				getLookupClass() != null && getLookupMethod(getLookupClass()) != null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -55,9 +56,7 @@ public class CoreProtectAdaptor_20_1 extends AbstractCoreProtectAdaptor implemen
 			// List<String> exclude_user_list, List<Integer> action_list, Location location, Integer[] radius, int check_time,
 			// boolean restrict_world, boolean lookup)
 
-			return lookupClass.getDeclaredMethod("performLookup", Statement.class, CommandSender.class,
-					List.class, List.class, List.class, List.class, List.class, List.class, Location.class, Integer[].class, Integer.TYPE,
-					Boolean.TYPE, Boolean.TYPE);
+			return lookupClass.getDeclaredMethod("performLookup", Statement.class, CommandSender.class, List.class, List.class, List.class, List.class, List.class, List.class, Location.class, Integer[].class, Long.TYPE, Boolean.TYPE, Boolean.TYPE);
 		} catch (final NoSuchMethodException e) {
 			return null;
 		}

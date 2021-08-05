@@ -84,7 +84,7 @@ class LookupCommand extends AbstractCommand {
 			Collections.reverse(result); // Oldest first (so placements are detected before breaks)
 			final Map<String, Boolean> userPlacedBlocks = new HashMap<>();
 			for (final String[] line : result) {
-				final CoreProtectAPI.ParseResult parse = plugin.getAPI().parseResult(line);
+				final CoreProtectAPI.ParseResult parse = XRayHunter.getCoreProtectAPI().parseResult(line);
 				final Material blockType = parse.getType();
 				final int actionId = parse.getActionId();
 				final String blockKey = getBlockKey(parse);

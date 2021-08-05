@@ -4,7 +4,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,7 +18,11 @@ import net.coreprotect.CoreProtectAPI;
 public class XRayHunter extends JavaPlugin {
 	private static final Logger log = Logger.getLogger(XRayHunter.class.getName());
 
-	private CoreProtectAPI api;
+	private static CoreProtectAPI api;
+
+	public static CoreProtectAPI getCoreProtectAPI() {
+		return api;
+	}
 
 	@Override
 	public void onEnable() {
@@ -33,13 +36,13 @@ public class XRayHunter extends JavaPlugin {
 		} catch (final Exception e) {
 			log.log(Level.WARNING, "Failed to submit metrics data", e);
 		}
-		this.api = coreProtectAPI;
+		api = coreProtectAPI;
 		getCommand("xhunt").setExecutor(new MainCommand(this));
 	}
 
 	// package protected
 	private CoreProtectAPI getCoreProtect() {
-		final Plugin plugin = Bukkit.getPluginManager().getPlugin("CoreProtect");
+		final Plugin plugin = getServer().getPluginManager().getPlugin("CoreProtect");
 		if (plugin instanceof CoreProtect && plugin.isEnabled()) {
 			final CoreProtect coreProtect = (CoreProtect) plugin;
 			final CoreProtectAPI api = coreProtect.getAPI();
@@ -48,15 +51,5 @@ public class XRayHunter extends JavaPlugin {
 			}
 		}
 		return null;
-	}
-
-	public CoreProtectAPI getAPI() {
-		if (api == null) {
-			final CoreProtectAPI coreProtectAPI = getCoreProtect();
-			if (coreProtectAPI != null) {
-				api = coreProtectAPI;
-			}
-		}
-		return api;
 	}
 }
