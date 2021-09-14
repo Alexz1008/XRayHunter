@@ -37,16 +37,20 @@ class LookupCommand extends AbstractCommand {
 	@Override
 	public boolean execute(final CommandSender sender, String alias, Map<String, Object> data, String... args) {
 		final Player player = (Player) sender;
-		if (args.length == 1) {
+		if (args.length >= 1) {
 			final long millis = TimeUtil.millisFromString(args[0]);
 			if (millis == 0) {
 				sender.sendMessage("Invalid time-argument, try \u00a792d");
 				return false;
 			}
 
+			int size = 10;
+			if (args.length == 2) {
+				size = Integer.parseInt(args[1]);
+			}
 			if(player.getWorld().getEnvironment() == World.Environment.NETHER) {
-				CoreProtectHandler.performLookup(plugin, sender, TimeUtil.millisAsSeconds(millis), PlayerStatsComparatorNether.MATS, null, new LookupCallback(sender));
-			} else { CoreProtectHandler.performLookup(plugin, sender, TimeUtil.millisAsSeconds(millis), PlayerStatsComparator.MATS, null, new LookupCallback(sender)); }
+				CoreProtectHandler.performLookup(plugin, sender, TimeUtil.millisAsSeconds(millis), PlayerStatsComparatorNether.MATS, null, new LookupCallback(sender, size));
+			} else { CoreProtectHandler.performLookup(plugin, sender, TimeUtil.millisAsSeconds(millis), PlayerStatsComparator.MATS, null, new LookupCallback(sender, size)); }
 
 			return true;
 		}
@@ -62,9 +66,11 @@ class LookupCommand extends AbstractCommand {
 
 	private class LookupCallback extends Callback {
 		private final CommandSender sender;
+		private final int size;
 
-		LookupCallback(CommandSender sender) {
+		LookupCallback(CommandSender sender, int size) {
 			this.sender = sender;
+			this.size = size;
 		}
 
 		@Override
@@ -124,14 +130,13 @@ class LookupCommand extends AbstractCommand {
 				.setUserData(dataMap);
 
 				final StringBuilder sb = new StringBuilder();
-				sb.append("Listing");
 				for (final Material mat : PlayerStatsComparatorNether.MATS) {
 					sb.append(PlayerStatsComparatorNether.getColor(mat) + "§l " + mat.name().substring(0, 3));
 				}
 				sb.append("\n");
 				int place = 1;
-				for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), 10))) {
-					sb.append(MessageFormat.format("§7#{0}", place));
+				for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), size))) {
+					sb.append("#" + place);
 					for (final Material mat : PlayerStatsComparatorNether.MATS) {
 						sb.append(PlayerStatsComparatorNether.getColor(mat) +
 								MessageFormat.format(" §l{0,number,##}§7({1,number,##}%)", stat.getCount(mat), 100 * stat.getRatio(mat)));
@@ -147,17 +152,25 @@ class LookupCommand extends AbstractCommand {
 				.setUserData(dataMap);
 
 				final StringBuilder sb = new StringBuilder();
-				sb.append("Listing");
 				for (final Material mat : PlayerStatsComparator.MATS) {
-					sb.append(PlayerStatsComparator.getColor(mat) + "§l " + mat.name().substring(0, 3));
+					if (mat.toString().contains("DEEPSLATE")) continue;
+					sb.append(PlayerStatsComparator.getColor(mat) + "§l " + mat.toString().substring(0, 3));
 				}
 				sb.append("\n");
 				int place = 1;
-				for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), 10))) {
-					sb.append(MessageFormat.format("§7#{0}", place));
+				for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), size))) {
+					sb.append("#" + place);
 					for (final Material mat : PlayerStatsComparator.MATS) {
+						if (mat.toString().contains("DEEPSLATE")) continue;
+						int count = stat.getCount(mat);
+						float ratio = stat.getRatio(mat);
+						if (PlayerStatsComparator.getDeepslateVariant(mat) != null) {
+							Material variant = PlayerStatsComparator.getDeepslateVariant(mat);
+							count += stat.getCount(variant);
+							ratio += stat.getRatio(variant);
+						}
 						sb.append(PlayerStatsComparator.getColor(mat) +
-								MessageFormat.format(" §l{0,number,##}§7({1,number,##}%)", stat.getCount(mat), 100 * stat.getRatio(mat)));
+								MessageFormat.format(" §l{0,number,##}§7 {1,number,##}%", count, 100 * ratio));
 					}
 					sb.append(" §9" + stat.getPlayer() + "\n");
 					place++;

@@ -96,7 +96,7 @@ public class DetailCommand extends AbstractCommand {
 						TimeUtil.millisAsString(tlast - vein.getTime()),
 						vein.getSize(),
 						PlayerStatsComparator.getColor(vein.getType()),
-						vein.getType().name().substring(0,3),
+						PlayerStatsComparator.getAlias(vein.getType()),
 						LocationUtil.asShortString(vein.getLocation()),
 						index++
 						) + "\n");
