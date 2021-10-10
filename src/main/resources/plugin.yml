@@ -4,7 +4,7 @@ version: ${project.version}
 description: XRay Hunter for CoreProtect v${project.version}
 author: R4zorax
 prefix: XRayHunter
-softdepend: [CoreProtect]
+softdepend: [CoreProtect, BanManager]
 api-version: 1.16
 commands:
   xrayhunt:
