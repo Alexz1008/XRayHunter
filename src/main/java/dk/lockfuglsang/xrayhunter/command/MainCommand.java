@@ -13,6 +13,7 @@ public class MainCommand extends BaseCommandExecutor {
 		add(new LookupCommand(plugin));
 		add(new DetailCommand());
 		add(new TeleportCommand());
+		add(new SuspiciousCommand(plugin));
 	}
 
 	@Override

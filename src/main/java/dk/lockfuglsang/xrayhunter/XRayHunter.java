@@ -88,14 +88,21 @@ public class XRayHunter extends JavaPlugin implements Listener {
 				}
 			}
 			Location loc = w.getSpawnLocation();
-			boolean banned = false;
-			try {
-				banned = BmAPI.isBanned("Okuur");
-				System.out.println(banned);
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			CoreProtectHandler.performLookup(this, p, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(p, 99));
+		}
+	}
+	
+	public void susCommand(CommandSender s) {
+		if (s.hasPermission("mycommand.staff")) {
+			World w = null;
+			for (World world : Bukkit.getWorlds()) {
+				if (world.getName().contains("Aurum")) {
+					w = world;
+					break;
+				}
 			}
-			// CoreProtectHandler.performLookup(this, p, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(p, 99));
+			Location loc = w.getSpawnLocation();
+			CoreProtectHandler.performLookup(this, s, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(s, 99));
 		}
 	}
 
@@ -164,30 +171,29 @@ public class XRayHunter extends JavaPlugin implements Listener {
 			.setUserData(dataMap);
 
 			final StringBuilder sb = new StringBuilder();
-			sb.append("§4[§c§lMLMC§4] §cThe following players are suspicious and not banned: \n");
+			sb.append("§4[§c§lMLMC§4] §cThe following players are suspicious and not banned:");
 			for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), size))) {
-				try {
-					Bukkit.getOfflinePlayer(BmAPI.getPlayer(stat.getPlayer()).getUUID()).isBanned();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				sb.append("§7- §e").append(stat.getPlayer());
-				for (final Material mat : PlayerStatsComparator.MATS) {
-					if (mat.toString().contains("DEEPSLATE")) continue;
-					int count = stat.getCount(mat);
-					float ratio = stat.getRatio(mat);
-					if (PlayerStatsComparator.getDeepslateVariant(mat) != null) {
-						Material variant = PlayerStatsComparator.getDeepslateVariant(mat);
-						count += stat.getCount(variant);
-						ratio += stat.getRatio(variant);
+				if (!stat.getPlayer().equals("#tnt") && !BmAPI.isBanned(stat.getPlayer())) {
+					int diaCount = stat.getCount(Material.DIAMOND_ORE);
+					float diaRatio = stat.getRatio(Material.DIAMOND_ORE);
+					diaCount += stat.getCount(Material.DEEPSLATE_DIAMOND_ORE);
+					diaRatio += stat.getRatio(Material.DEEPSLATE_DIAMOND_ORE);
+					
+					int stoneCount = stat.getCount(Material.STONE);
+					float stoneRatio = stat.getRatio(Material.STONE);
+					
+					// Suspicious
+					if (diaCount >= 10 && diaRatio >= 0.02 && stoneCount >= 100) {
+						sb.append("\n§7- §e" + stat.getPlayer() + "§: §b");
+						sb.append(PlayerStatsComparator.getColor(Material.DIAMOND_ORE) +
+								MessageFormat.format("§l{0,number,##} {1,number,##}%", diaCount, 100 * diaRatio));
+						sb.append("§7, ");
+						sb.append(PlayerStatsComparator.getColor(Material.STONE) +
+								MessageFormat.format("§l{0,number,##} {1,number,##}%", stoneCount, 100 * stoneRatio));
 					}
-					sb.append(PlayerStatsComparator.getColor(mat) +
-							MessageFormat.format(" §l{0,number,##}§7 {1,number,##}%", count, 100 * ratio));
 				}
-				sb.append(" §9" + stat.getPlayer() + "\n");
 			}
 			sender.sendMessage(sb.toString().split("\n"));
-
 		}
 	}
 
