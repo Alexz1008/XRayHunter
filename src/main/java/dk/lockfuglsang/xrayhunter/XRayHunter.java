@@ -1,5 +1,6 @@
 package dk.lockfuglsang.xrayhunter;
 
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -208,6 +209,18 @@ public class XRayHunter extends JavaPlugin implements Listener {
 				}
 			}
 			sender.sendMessage(sb.toString().split("\n"));
+			System.out.println(BmAPI.isBanned("Okuur"));
+			try {
+				System.out.println(BmAPI.getPlayer("Okuur").getUUID());
+				System.out.println(BmAPI.getBanRecords(BmAPI.getPlayer("Okuur")).current().getReason());
+				System.out.println(BmAPI.getBanRecords(BmAPI.getPlayer("Okuur")).current().getExpired());
+				System.out.println(BmAPI.getPlayer("Neoblade298").getUUID());
+				System.out.println(BmAPI.getBanRecords(BmAPI.getPlayer("Neoblade298")).current().getReason());
+				System.out.println(BmAPI.getBanRecords(BmAPI.getPlayer("Neoblade298")).current().getExpired());
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
