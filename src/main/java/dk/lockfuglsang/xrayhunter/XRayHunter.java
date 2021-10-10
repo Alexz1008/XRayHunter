@@ -81,11 +81,25 @@ public class XRayHunter extends JavaPlugin implements Listener {
 		Player p = e.getPlayer();
 		if (p.hasPermission("mycommand.staff")) {
 			World w = null;
+			ArrayList<World> resources = new ArrayList<World>();
 			for (World world : Bukkit.getWorlds()) {
 				if (world.getName().contains("Aurum")) {
 					w = world;
-					break;
+					resources.add(world);
 				}
+			}
+			if (resources.size() > 1) {
+				int count = -1;
+				World lowestWorld = null;
+				for (World world : resources) {
+					// Find the Aurum that is smallest number
+					int num = Integer.parseInt(world.getName().substring(5));
+					if (count == -1 || num < count) {
+						count = num;
+						lowestWorld = world;
+					}
+				}
+				w = lowestWorld;
 			}
 			Location loc = w.getSpawnLocation();
 			CoreProtectHandler.performLookup(this, p, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(p, 99));
