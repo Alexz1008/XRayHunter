@@ -1,6 +1,5 @@
 package dk.lockfuglsang.xrayhunter;
 
-import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,31 +102,47 @@ public class XRayHunter extends JavaPlugin implements Listener {
 				w = lowestWorld;
 			}
 			Location loc = w.getSpawnLocation();
-			CoreProtectHandler.performLookup(this, p, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(p, 99));
+			CoreProtectHandler.performLookup(this, p, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(p, 99, loc));
 		}
 	}
 	
 	public void susCommand(CommandSender s) {
 		if (s.hasPermission("mycommand.staff")) {
 			World w = null;
+			ArrayList<World> resources = new ArrayList<World>();
 			for (World world : Bukkit.getWorlds()) {
 				if (world.getName().contains("Aurum")) {
 					w = world;
-					break;
+					resources.add(world);
 				}
 			}
+			if (resources.size() > 1) {
+				int count = -1;
+				World lowestWorld = null;
+				for (World world : resources) {
+					// Find the Aurum that is smallest number
+					int num = Integer.parseInt(world.getName().substring(5));
+					if (count == -1 || num < count) {
+						count = num;
+						lowestWorld = world;
+					}
+				}
+				w = lowestWorld;
+			}
 			Location loc = w.getSpawnLocation();
-			CoreProtectHandler.performLookup(this, s, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(s, 99));
+			CoreProtectHandler.performLookup(this, s, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(s, 99, loc));
 		}
 	}
 
 	private class LookupCallback extends Callback {
 		private final CommandSender sender;
 		private final int size;
+		private final Location loc;
 
-		LookupCallback(CommandSender sender, int size) {
+		LookupCallback(CommandSender sender, int size, Location loc) {
 			this.sender = sender;
 			this.size = size;
+			this.loc = loc;
 		}
 
 		@Override
@@ -135,7 +150,7 @@ public class XRayHunter extends JavaPlugin implements Listener {
 			final List<String[]> result = getData();
 			if (result == null || result.isEmpty()) {
 				if (sender instanceof Player) {
-					sender.sendMessage(MessageFormat.format("No suspicious activity within that time-frame in {0}!", ((Player) sender).getLocation().getWorld().getName()));
+					sender.sendMessage(MessageFormat.format("No suspicious activity within that time-frame in {0}!", loc.getWorld().getName()));
 				} else {
 					sender.sendMessage("No suspicious activity within that time-frame!");
 				}
@@ -173,7 +188,7 @@ public class XRayHunter extends JavaPlugin implements Listener {
 			}
 			if (top10.isEmpty()) {
 				if (sender instanceof Player) {
-					sender.sendMessage(MessageFormat.format("No suspicious activity within that time-frame in {0}!", ((Player) sender).getLocation().getWorld().getName()));
+					sender.sendMessage(MessageFormat.format("No suspicious activity within that time-frame in {0}!", loc.getWorld().getName()));
 				} else {
 					sender.sendMessage("No suspicious activity within that time-frame!");
 				}
@@ -186,7 +201,7 @@ public class XRayHunter extends JavaPlugin implements Listener {
 			.setUserData(dataMap);
 
 			final StringBuilder sb = new StringBuilder();
-			sb.append("§4[§c§lMLMC§4] §cThe following players are suspicious and not banned:");
+			boolean isEmpty = true;
 			for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), size))) {
 				if (!stat.getPlayer().equals("#tnt") && !BmAPI.isBanned(stat.getPlayer())) {
 					int diaCount = stat.getCount(Material.DIAMOND_ORE);
@@ -199,6 +214,10 @@ public class XRayHunter extends JavaPlugin implements Listener {
 					
 					// Suspicious
 					if (diaCount >= 10 && diaRatio >= 0.02 && stoneCount >= 100) {
+						if (isEmpty) {
+							sb.append("§4[§c§lMLMC§4] §cThe following players are tagged for x-ray:");
+							isEmpty = false;
+						}
 						sb.append("\n§7- §e" + stat.getPlayer() + "§: §b");
 						sb.append(PlayerStatsComparator.getColor(Material.DIAMOND_ORE) +
 								MessageFormat.format("§l{0,number,##} {1,number,##}%", diaCount, 100 * diaRatio));
@@ -208,7 +227,12 @@ public class XRayHunter extends JavaPlugin implements Listener {
 					}
 				}
 			}
-			sender.sendMessage(sb.toString().split("\n"));
+			if (!isEmpty) {
+				sender.sendMessage(sb.toString().split("\n"));
+			}
+			else {
+				sender.sendMessage("§4[§c§lMLMC§4] §cNo suspicious players in §e" + loc.getWorld());
+			}
 		}
 	}
 
