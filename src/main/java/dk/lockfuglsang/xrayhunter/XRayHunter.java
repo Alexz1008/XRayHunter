@@ -236,13 +236,8 @@ public class XRayHunter extends JavaPlugin implements Listener {
 					int stoneCount = stat.getCount(Material.STONE);
 					float stoneRatio = stat.getRatio(Material.STONE);
 					
-					try {
-						if (hasRecentReport(BmAPI.getPlayer(stat.getPlayer()).getUUID())) {
-							continue;
-						}
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if (hasRecentReport(stat.getPlayer())) {
+						continue;
 					}
 					
 					// Suspicious
@@ -269,14 +264,14 @@ public class XRayHunter extends JavaPlugin implements Listener {
 		}
 	}
 	
-	private boolean hasRecentReport(UUID uuid) {
+	private boolean hasRecentReport(String name) {
 		try{
 			Connection con = DriverManager.getConnection(url, user, pass);
 			Statement stmt = con.createStatement();
 			ResultSet rs;
 			
 			// Show all relevant PPRs
-			rs = stmt.executeQuery("SELECT * FROM neopprs_pprs WHERE uuid = '" + uuid + "';");
+			rs = stmt.executeQuery("SELECT * FROM neopprs_pprs WHERE LOWER(username) LIKE LOWER('" + name + "');");
 			while (rs.next()) {
 				String date = rs.getString(5);
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yy", Locale.ENGLISH);
