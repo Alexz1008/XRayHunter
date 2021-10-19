@@ -1,11 +1,23 @@
 package dk.lockfuglsang.xrayhunter;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +27,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,8 +36,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import me.confuser.banmanager.common.api.BmAPI;
-
-
 import dk.lockfuglsang.util.TimeUtil;
 import dk.lockfuglsang.xrayhunter.command.MainCommand;
 import dk.lockfuglsang.xrayhunter.coreprotect.Callback;
@@ -41,6 +53,8 @@ public class XRayHunter extends JavaPlugin implements Listener {
 	private static final Logger log = Logger.getLogger(XRayHunter.class.getName());
 
 	private static CoreProtectAPI api;
+	// SQL
+	public String url, user, pass;
 
 	public static CoreProtectAPI getCoreProtectAPI() {
 		return api;
@@ -61,6 +75,16 @@ public class XRayHunter extends JavaPlugin implements Listener {
 		api = coreProtectAPI;
 		getCommand("xhunt").setExecutor(new MainCommand(this));
 		getServer().getPluginManager().registerEvents(this, this);
+
+		File file = new File(getDataFolder(), "config.yml");
+		ConfigurationSection cfg = YamlConfiguration.loadConfiguration(file);
+
+		// SQL
+		ConfigurationSection sql = cfg.getConfigurationSection("sql");
+		url = "jdbc:mysql://" + sql.getString("host") + ":" + sql.getString("port") + "/" + 
+				sql.getString("db") + sql.getString("flags");
+		user = sql.getString("username");
+		pass = sql.getString("password");
 	}
 
 	// package protected
@@ -212,8 +236,17 @@ public class XRayHunter extends JavaPlugin implements Listener {
 					int stoneCount = stat.getCount(Material.STONE);
 					float stoneRatio = stat.getRatio(Material.STONE);
 					
+					try {
+						if (hasRecentReport(BmAPI.getPlayer(stat.getPlayer()).getUUID())) {
+							continue;
+						}
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					// Suspicious
-					if (diaCount >= 10 && diaRatio >= 0.02 && stoneCount >= 100) {
+					if (diaCount >= 10 && diaRatio >= 0.02 && stoneCount >= 1000) {
 						if (isEmpty) {
 							sb.append("§4[§c§lMLMC§4] §cThe following players are tagged for x-ray:");
 							isEmpty = false;
@@ -234,6 +267,31 @@ public class XRayHunter extends JavaPlugin implements Listener {
 				sender.sendMessage("§4[§c§lMLMC§4] §cNo suspicious players in §e" + loc.getWorld());
 			}
 		}
+	}
+	
+	private boolean hasRecentReport(UUID uuid) {
+		try{
+			Connection con = DriverManager.getConnection(url, user, pass);
+			Statement stmt = con.createStatement();
+			ResultSet rs;
+			
+			// Show all relevant PPRs
+			rs = stmt.executeQuery("SELECT * FROM neopprs_pprs WHERE uuid = '" + uuid + "';");
+			while (rs.next()) {
+				String date = rs.getString(5);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yy", Locale.ENGLISH);
+				LocalDate pprTime = LocalDate.parse(date, formatter);
+				LocalDate now = LocalDate.now();
+				if (now.toEpochDay() - pprTime.toEpochDay() <= 1) {
+					return true;
+				}
+			}
+			con.close();
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		return false;
 	}
 
 	private void updateMap(Map<Material, Integer> blockCount, Material blockId) {
