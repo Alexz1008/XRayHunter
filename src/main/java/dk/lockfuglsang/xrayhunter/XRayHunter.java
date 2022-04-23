@@ -284,7 +284,7 @@ public class XRayHunter extends JavaPlugin implements Listener {
 			con.close();
 		}
 		catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		return false;
 	}
