@@ -93,7 +93,8 @@ public class XRayHunter extends JavaPlugin implements Listener {
 		if (plugin instanceof CoreProtect && plugin.isEnabled()) {
 			final CoreProtect coreProtect = (CoreProtect) plugin;
 			final CoreProtectAPI api = coreProtect.getAPI();
-			if (api != null && api.APIVersion() >= 7 && CoreProtectHandler.getAdaptor() != null) {
+			if (api != null && api.APIVersion() >= 9) {
+				Bukkit.getLogger().log(Level.INFO, "[XRayHunter] Loaded using CoreProtect API Version " + api.APIVersion());
 				return api;
 			}
 		}
@@ -104,66 +105,48 @@ public class XRayHunter extends JavaPlugin implements Listener {
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		if (p.hasPermission("mycommand.staff")) {
-			World w = null;
-			ArrayList<World> resources = new ArrayList<World>();
-			for (World world : Bukkit.getWorlds()) {
-				if (world.getName().contains("Aurum")) {
-					w = world;
-					resources.add(world);
-				}
-			}
-			if (resources.size() > 1) {
-				int count = -1;
-				World lowestWorld = null;
-				for (World world : resources) {
-					// Find the Aurum that is smallest number
-					int num = Integer.parseInt(world.getName().substring(5));
-					if (count == -1 || num < count) {
-						count = num;
-						lowestWorld = world;
-					}
-				}
-				w = lowestWorld;
-			}
-			Location loc = w.getSpawnLocation();
-			CoreProtectHandler.performLookup(this, p, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(p, 99, loc));
+			doSusLookup(p);
 		}
 	}
 	
 	public void susCommand(CommandSender s) {
 		if (s.hasPermission("mycommand.staff")) {
-			World w = null;
-			ArrayList<World> resources = new ArrayList<World>();
-			for (World world : Bukkit.getWorlds()) {
-				if (world.getName().contains("Aurum")) {
-					w = world;
-					resources.add(world);
-				}
-			}
-			if (resources.size() > 1) {
-				int count = -1;
-				World lowestWorld = null;
-				for (World world : resources) {
-					// Find the Aurum that is smallest number
-					int num = Integer.parseInt(world.getName().substring(5));
-					if (count == -1 || num < count) {
-						count = num;
-						lowestWorld = world;
-					}
-				}
-				w = lowestWorld;
-			}
-			Location loc = w.getSpawnLocation();
-			CoreProtectHandler.performLookup(this, s, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, null, new LookupCallback(s, 99, loc));
+			doSusLookup(s);
 		}
 	}
+	
+	private void doSusLookup(CommandSender s) {
+		World w = null;
+		ArrayList<World> resources = new ArrayList<World>();
+		for (World world : Bukkit.getWorlds()) {
+			if (world.getName().contains("Aurum")) {
+				w = world;
+				resources.add(world);
+			}
+		}
+		if (resources.size() > 1) {
+			int count = -1;
+			World lowestWorld = null;
+			for (World world : resources) {
+				// Find the Aurum that is smallest number
+				int num = Integer.parseInt(world.getName().substring(5));
+				if (count == -1 || num < count) {
+					count = num;
+					lowestWorld = world;
+				}
+			}
+			w = lowestWorld;
+		}
+		Location loc = w.getSpawnLocation();
+		CoreProtectHandler.performLookup(this, s, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, new SusCallback(s, 99, loc));
+	}
 
-	private class LookupCallback extends Callback {
+	private class SusCallback extends Callback {
 		private final CommandSender sender;
 		private final int size;
 		private final Location loc;
 
-		LookupCallback(CommandSender sender, int size, Location loc) {
+		SusCallback(CommandSender sender, int size, Location loc) {
 			this.sender = sender;
 			this.size = size;
 			this.loc = loc;
@@ -233,15 +216,17 @@ public class XRayHunter extends JavaPlugin implements Listener {
 					diaCount += stat.getCount(Material.DEEPSLATE_DIAMOND_ORE);
 					diaRatio += stat.getRatio(Material.DEEPSLATE_DIAMOND_ORE);
 					
-					int stoneCount = stat.getCount(Material.STONE);
-					float stoneRatio = stat.getRatio(Material.STONE);
+					int stoneCount = stat.getCount(Material.STONE) + stat.getCount(Material.DEEPSLATE) + stat.getCount(Material.DIORITE) + stat.getCount(Material.ANDESITE) +
+							stat.getCount(Material.GRANITE);
+					float stoneRatio = stat.getRatio(Material.STONE) + stat.getRatio(Material.DEEPSLATE) + stat.getRatio(Material.DIORITE) + stat.getRatio(Material.ANDESITE) +
+							stat.getRatio(Material.GRANITE);
 					
 					if (hasRecentReport(stat.getPlayer())) {
 						continue;
 					}
 					
 					// Suspicious
-					if (diaCount >= 10 && diaRatio >= 0.02 && stoneCount >= 1000) {
+					if (diaCount >= 10 && diaRatio >= 0.02 && stoneCount >= 100) {
 						if (isEmpty) {
 							sb.append("§4[§c§lMLMC§4] §cThe following players are tagged for x-ray:");
 							isEmpty = false;
@@ -259,7 +244,7 @@ public class XRayHunter extends JavaPlugin implements Listener {
 				sender.sendMessage(sb.toString().split("\n"));
 			}
 			else {
-				sender.sendMessage("§4[§c§lMLMC§4] §cNo suspicious players in §e" + loc.getWorld());
+				sender.sendMessage("§4[§c§lMLMC§4] §cNo suspicious players in §e" + loc.getWorld().getName());
 			}
 		}
 	}

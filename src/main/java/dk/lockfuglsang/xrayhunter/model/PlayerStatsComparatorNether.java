@@ -12,7 +12,7 @@ import org.bukkit.Material;
  * Comparator the maps of block-counts for two users
  */
 public class PlayerStatsComparatorNether implements Comparator<PlayerStats> {
-	public static final List<Material> MATS = Arrays.asList(
+	public static final List<Object> MATS = Arrays.asList(
 			Material.ANCIENT_DEBRIS,
 			Material.NETHER_QUARTZ_ORE,
 			Material.NETHER_GOLD_ORE,
@@ -35,7 +35,8 @@ public class PlayerStatsComparatorNether implements Comparator<PlayerStats> {
 	@Override
 	public int compare(PlayerStats o1, PlayerStats o2) {
 		int cmp = 0;
-		for (final Material blockId : MATS) {
+		for (final Object obj : MATS) {
+			Material blockId = (Material) obj;
 			final int c1 = o1.getCount(blockId);
 			final int c2 = o2.getCount(blockId);
 			cmp = c2 - c1;

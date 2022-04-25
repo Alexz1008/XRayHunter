@@ -12,7 +12,7 @@ import org.bukkit.Material;
  * Comparator the maps of block-counts for two users
  */
 public class PlayerStatsComparator implements Comparator<PlayerStats> {
-	public static final List<Material> MATS = Arrays.asList(
+	public static final List<Object> MATS = Arrays.asList(
 			Material.DIAMOND_ORE,
 			Material.DEEPSLATE_DIAMOND_ORE,
 			Material.EMERALD_ORE,
@@ -79,7 +79,8 @@ public class PlayerStatsComparator implements Comparator<PlayerStats> {
 	@Override
 	public int compare(PlayerStats o1, PlayerStats o2) {
 		int cmp = 0;
-		for (final Material blockId : MATS) {
+		for (final Object obj : MATS) {
+			Material blockId = (Material) obj;
 			final int c1 = o1.getCount(blockId);
 			final int c2 = o2.getCount(blockId);
 			cmp = c2 - c1;

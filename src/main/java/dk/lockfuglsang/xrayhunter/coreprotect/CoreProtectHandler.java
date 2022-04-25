@@ -15,6 +15,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import net.coreprotect.CoreProtect;
+import net.coreprotect.CoreProtectAPI;
 import net.coreprotect.database.Database;
 
 /**
@@ -24,37 +26,24 @@ public class CoreProtectHandler {
 	public static final int ACTION_BREAK = 0;
 	public static final int ACTION_PLACE = 1;
 	private static final Logger log = Logger.getLogger(CoreProtectHandler.class.getName());
-	private static final List<CoreProtectAdaptor> adaptors = Arrays.<CoreProtectAdaptor>asList(
-			new CoreProtectAdaptor_20_1()
-			);
+	private static CoreProtectAPI api = null;
 
-	public static void performLookup(final Plugin plugin, final CommandSender sender, Location loc, final int stime, final List<Material> restrictBlocks, final List<Integer> excludeBlocks, final Callback callback) {
+	public static void performLookup(final Plugin plugin, final CommandSender sender, Location loc, final int stime, final List<Object> restrictBlocks, final Callback callback) {
+		if (api == null) {
+			api = ((CoreProtect) Bukkit.getPluginManager().getPlugin("CoreProtect")).getAPI();
+		}
+		
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, (Runnable) () -> {
 			try (Connection connection = Database.getConnection(true); Statement statement = connection.createStatement()) {
 				final List<Integer> action_list = new ArrayList<>();
 				action_list.add(0); // ActionId = 0 - Break
 				action_list.add(1); // ActionId = 1 - Place
-				final int now = (int) (System.currentTimeMillis() / 1000L);
-				final CoreProtectAdaptor adaptor = getAdaptor();
-				if (adaptor != null) {
-					final List<String[]> data = adaptor.performLookup(statement, restrictBlocks, action_list, loc, now - stime, loc != null);
-					callback.setData(data);
-				} else {
-					log.log(Level.WARNING, "Unable to find suitable CoreProtect adaptor!");
-				}
+				final List<String[]> data = api.performLookup(stime, null, null, restrictBlocks, null, action_list, 10000, loc);
+				callback.setData(data);
 				Bukkit.getScheduler().runTaskAsynchronously(plugin, callback);
 			} catch (final Exception e) {
 				log.log(Level.WARNING, "Unable to lookup data", e);
 			}
 		});
-	}
-
-	public static CoreProtectAdaptor getAdaptor() {
-		for (final CoreProtectAdaptor adaptor : adaptors) {
-			if (adaptor.isAvailable()) {
-				return adaptor;
-			}
-		}
-		return null;
 	}
 }

@@ -49,8 +49,8 @@ class LookupCommand extends AbstractCommand {
 				size = Integer.parseInt(args[1]);
 			}
 			if(player.getWorld().getEnvironment() == World.Environment.NETHER) {
-				CoreProtectHandler.performLookup(plugin, sender, player.getLocation(), TimeUtil.millisAsSeconds(millis), PlayerStatsComparatorNether.MATS, null, new LookupCallback(sender, size));
-			} else { CoreProtectHandler.performLookup(plugin, sender, player.getLocation(), TimeUtil.millisAsSeconds(millis), PlayerStatsComparator.MATS, null, new LookupCallback(sender, size)); }
+				CoreProtectHandler.performLookup(plugin, sender, player.getLocation(), TimeUtil.millisAsSeconds(millis), PlayerStatsComparatorNether.MATS, new LookupCallback(sender, size));
+			} else { CoreProtectHandler.performLookup(plugin, sender, player.getLocation(), TimeUtil.millisAsSeconds(millis), PlayerStatsComparator.MATS, new LookupCallback(sender, size)); }
 
 			return true;
 		}
@@ -80,7 +80,7 @@ class LookupCommand extends AbstractCommand {
 				if (sender instanceof Player) {
 					sender.sendMessage(MessageFormat.format("No suspicious activity within that time-frame in {0}!", ((Player) sender).getLocation().getWorld().getName()));
 				} else {
-					sender.sendMessage("No suspicious activity within that time-frame!");
+					sender.sendMessage("Nosuspicious activity within that time-frame!");
 				}
 				return;
 			}
@@ -130,14 +130,16 @@ class LookupCommand extends AbstractCommand {
 				.setUserData(dataMap);
 
 				final StringBuilder sb = new StringBuilder();
-				for (final Material mat : PlayerStatsComparatorNether.MATS) {
+				for (final Object obj : PlayerStatsComparatorNether.MATS) {
+					Material mat = (Material) obj;
 					sb.append(PlayerStatsComparatorNether.getColor(mat) + "§l " + mat.name().substring(0, 3));
 				}
 				sb.append("\n");
 				int place = 1;
 				for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), size))) {
 					sb.append("#" + place);
-					for (final Material mat : PlayerStatsComparatorNether.MATS) {
+					for (final Object obj : PlayerStatsComparatorNether.MATS) {
+						Material mat = (Material) obj;
 						sb.append(PlayerStatsComparatorNether.getColor(mat) +
 								MessageFormat.format(" §l{0,number,##}§7({1,number,##}%)", stat.getCount(mat), 100 * stat.getRatio(mat)));
 					}
@@ -152,7 +154,8 @@ class LookupCommand extends AbstractCommand {
 				.setUserData(dataMap);
 
 				final StringBuilder sb = new StringBuilder();
-				for (final Material mat : PlayerStatsComparator.MATS) {
+				for (final Object obj : PlayerStatsComparator.MATS) {
+					Material mat = (Material) obj;
 					if (mat.toString().contains("DEEPSLATE")) continue;
 					sb.append(PlayerStatsComparator.getColor(mat) + "§l " + mat.toString().substring(0, 3));
 				}
@@ -160,7 +163,8 @@ class LookupCommand extends AbstractCommand {
 				int place = 1;
 				for (final PlayerStats stat : top10.subList(0, Math.min(top10.size(), size))) {
 					sb.append("#" + place);
-					for (final Material mat : PlayerStatsComparator.MATS) {
+					for (final Object obj : PlayerStatsComparator.MATS) {
+						Material mat = (Material) obj;
 						if (mat.toString().contains("DEEPSLATE")) continue;
 						int count = stat.getCount(mat);
 						float ratio = stat.getRatio(mat);
