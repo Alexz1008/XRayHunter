@@ -173,10 +173,6 @@ public class XRayHunter extends JavaPlugin implements Listener {
 				final Material blockType = parse.getType();
 				final int actionId = parse.getActionId();
 				final String blockKey = getBlockKey(parse);
-				if (actionId == CoreProtectHandler.ACTION_PLACE) {
-					userPlacedBlocks.put(blockKey, Boolean.TRUE);
-					continue; // skip the rest for placements
-				}
 				if (actionId == CoreProtectHandler.ACTION_BREAK && !userPlacedBlocks.containsKey(blockKey)) {
 					updateMap(blockCount, blockType);
 					if (!playerCount.containsKey(parse.getPlayer())) {

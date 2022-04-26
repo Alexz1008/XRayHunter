@@ -37,7 +37,6 @@ public class CoreProtectHandler {
 			try (Connection connection = Database.getConnection(true); Statement statement = connection.createStatement()) {
 				final List<Integer> action_list = new ArrayList<>();
 				action_list.add(0); // ActionId = 0 - Break
-				action_list.add(1); // ActionId = 1 - Place
 				final List<String[]> data = api.performLookup(stime, null, null, restrictBlocks, null, action_list, 10000, loc);
 				callback.setData(data);
 				Bukkit.getScheduler().runTaskAsynchronously(plugin, callback);
