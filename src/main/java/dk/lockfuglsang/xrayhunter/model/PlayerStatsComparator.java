@@ -22,6 +22,7 @@ public class PlayerStatsComparator implements Comparator<PlayerStats> {
 			Material.GOLD_ORE,
 			Material.DEEPSLATE_IRON_ORE,
 			Material.IRON_ORE,
+			Material.DEEPSLATE,
 			Material.STONE
 			);
 
@@ -36,6 +37,7 @@ public class PlayerStatsComparator implements Comparator<PlayerStats> {
 		MAT_COLORS.put(Material.DEEPSLATE_GOLD_ORE, "§e");
 		MAT_COLORS.put(Material.IRON_ORE, "§f");
 		MAT_COLORS.put(Material.DEEPSLATE_IRON_ORE, "§f");
+		MAT_COLORS.put(Material.DEEPSLATE, "§7");
 		MAT_COLORS.put(Material.STONE, "§7");
 	}
 
@@ -50,6 +52,7 @@ public class PlayerStatsComparator implements Comparator<PlayerStats> {
 		MAT_ALIASES.put(Material.DEEPSLATE_GOLD_ORE, "DGOL");
 		MAT_ALIASES.put(Material.IRON_ORE, "IRO");
 		MAT_ALIASES.put(Material.DEEPSLATE_IRON_ORE, "DIRO");
+		MAT_ALIASES.put(Material.DEEPSLATE, "DSTO");
 		MAT_ALIASES.put(Material.STONE, "STO");
 	}
 	
