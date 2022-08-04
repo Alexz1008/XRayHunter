@@ -62,6 +62,7 @@ public class PlayerStatsComparator implements Comparator<PlayerStats> {
 		DEEPSLATE_VARIANTS.put(Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE);
 		DEEPSLATE_VARIANTS.put(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE);
 		DEEPSLATE_VARIANTS.put(Material.IRON_ORE, Material.DEEPSLATE_IRON_ORE);
+		DEEPSLATE_VARIANTS.put(Material.STONE, Material.DEEPSLATE);
 	}
 
 	public static String getAlias(Material mat) {
