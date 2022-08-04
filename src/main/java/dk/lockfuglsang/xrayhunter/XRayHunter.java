@@ -116,9 +116,12 @@ public class XRayHunter extends JavaPlugin implements Listener {
 	}
 	
 	private void doSusLookup(CommandSender s) {
-		World w = Bukkit.getWorld("Invenire");
-		Location loc = w.getSpawnLocation();
-		CoreProtectHandler.performLookup(this, s, loc, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, new SusCallback(s, 99, loc));
+		World w1 = Bukkit.getWorld("Invenire");
+		Location loc1 = w1.getSpawnLocation();
+		World w2 = Bukkit.getWorld("Cyprus");
+		Location loc2 = w2.getSpawnLocation();
+		CoreProtectHandler.performLookup(this, s, loc1, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, new SusCallback(s, 99, loc1));
+		CoreProtectHandler.performLookup(this, s, loc2, TimeUtil.millisAsSeconds(TimeUtil.millisFromString("2d")), PlayerStatsComparator.MATS, new SusCallback(s, 99, loc2));
 	}
 
 	private class SusCallback extends Callback {
@@ -204,7 +207,7 @@ public class XRayHunter extends JavaPlugin implements Listener {
 					// Suspicious
 					if (diaCount >= 10 && diaRatio >= 0.02 && stoneCount >= 100) {
 						if (isEmpty) {
-							sb.append("§4[§c§lMLMC§4] §cThe following players are tagged for x-ray:");
+							sb.append("§4[§c§lMLMC§4] §cThe following players are tagged for x-ray in " + loc.getWorld().getName() + ":");
 							isEmpty = false;
 						}
 						sb.append("\n§7- §e" + stat.getPlayer() + "§: §b");
