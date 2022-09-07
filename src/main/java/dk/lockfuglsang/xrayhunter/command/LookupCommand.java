@@ -84,7 +84,6 @@ class LookupCommand extends AbstractCommand {
 				}
 				return;
 			}
-			System.out.println("This happened");
 			final Map<Material, Integer> blockCount = new HashMap<>();
 			final Map<String, Map<Material, Integer>> playerCount = new HashMap<>();
 			final Map<String, List<CoreProtectAPI.ParseResult>> dataMap = new HashMap<>();
@@ -166,7 +165,7 @@ class LookupCommand extends AbstractCommand {
 					sb.append("#" + place);
 					for (final Object obj : PlayerStatsComparator.MATS) {
 						Material mat = (Material) obj;
-						if (mat.toString().contains("DEEPSLATE_")) continue;
+						if (mat.toString().contains("DEEPSLATE")) continue;
 						int count = stat.getCount(mat);
 						float ratio = stat.getRatio(mat);
 						if (PlayerStatsComparator.getDeepslateVariant(mat) != null) {
