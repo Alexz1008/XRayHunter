@@ -18,7 +18,10 @@ public enum VeinLocator {;
     private static final Collection<Material> IGNORE = Arrays.asList(
             Material.STONE,
             Material.IRON_ORE,
-            Material.GOLD_ORE
+            Material.GOLD_ORE,
+            Material.DEEPSLATE,
+            Material.DEEPSLATE_IRON_ORE,
+            Material.DEEPSLATE_GOLD_ORE
     );
     public static List<OreVein> getVeins(List<CoreProtectAPI.ParseResult> data) {
         List<OreVein> veins = new ArrayList<>();
